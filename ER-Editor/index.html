@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER Diagram Editor - Hackathon Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        /* Main Layout */
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .sidebar-section h3 {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Playback Controls */
+        .playback-controls {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .playback-controls .btn {
+            flex: 1;
+            min-width: 45%;
+            margin-bottom: 5px;
+            padding: 8px;
+            font-size: 12px;
+            justify-content: center;
+        }
+        
+        .speed-control {
+            margin-top: 10px;
+        }
+        
+        .speed-control label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .speed-control input {
+            width: 100%;
+        }
+        
+        .speed-value {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: 3px;
+        }
+        
+        /* Canvas Area */
+        .canvas-container {
+            flex: 1;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #graphContainer {
+            width: 100%;
+            height: 100%;
+            background: white;
+            cursor: default;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            width: 350px;
+            background: white;
+            border-left: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .panel-tabs {
+            display: flex;
+            background: #f9fafb;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .panel-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .panel-tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .panel-content > div {
+            display: none;
+        }
+        
+        .panel-content > div.active {
+            display: block;
+        }
+        
+        /* Validation Panel */
+        .validation-summary {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .validation-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .validation-stat .label {
+            color: #666;
+        }
+        
+        .validation-stat .value {
+            font-weight: 600;
+        }
+        
+        .issue-list {
+            margin-top: 15px;
+        }
+        
+        .issue {
+            background: white;
+            border-left: 3px solid #e0e0e0;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .issue.error {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .issue.warning {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+        
+        .issue.info {
+            border-left-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .issue-type {
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        
+        .issue-message {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .issue-suggestion {
+            color: #666;
+            font-style: italic;
+            font-size: 12px;
+            white-space: pre-line;
+        }
+        
+        /* SQL Panel */
+        .sql-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre;
+        }
+        
+        .sql-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .sql-controls .btn {
+            flex: 1;
+        }
+        
+        .dialect-selector {
+            margin-bottom: 15px;
+        }
+        
+        .dialect-selector label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .dialect-selector select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background: #f9fafb;
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 20px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        
+        /* Icons (simple emoji-based) */
+        .icon {
+            font-size: 16px;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎨 ER Diagram Editor</h1>
+            <p>Interactive Entity-Relationship Diagram Builder with Playback & Validation</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3>🏗️ Create Elements</h3>
+                    <button class="btn btn-primary" id="btnAddEntity">
+                        <span class="icon">📦</span> Add Entity
+                    </button>
+                    <button class="btn btn-primary" id="btnAddAttribute">
+                        <span class="icon">🏷️</span> Add Attribute
+                    </button>
+                    <button class="btn btn-primary" id="btnAddRelationship">
+                        <span class="icon">🔗</span> Add Relationship (1:N)
+                    </button>
+                    <button class="btn btn-primary" id="btnAddManyToMany">
+                        <span class="icon">↔️</span> Add M:N Relationship
+                    </button>
+                    <button class="btn btn-secondary" id="btnMarkPK">
+                        <span class="icon">🔑</span> Mark as Primary Key
+                    </button>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>▶️ Playback Controls</h3>
+                    <div class="playback-controls">
+                        <button class="btn btn-success" id="btnPlay">
+                            <span class="icon">▶️</span> Play
+                        </button>
+                        <button class="btn btn-secondary" id="btnPause">
+                            <span class="icon">⏸️</span> Pause
+                        </button>
+                        <button class="btn btn-secondary" id="btnStepForward">
+                            <span class="icon">⏭️</span> Step
+                        </button>
+                        <button class="btn btn-secondary" id="btnStepBack">
+                            <span class="icon">⏮️</span> Back
+                        </button>
+                        <button class="btn btn-danger" id="btnStop">
+                            <span class="icon">⏹️</span> Stop
+                        </button>
+                        <button class="btn btn-secondary" id="btnReset">
+                            <span class="icon">🔄</span> Reset
+                        </button>
+                    </div>
+                    
+                    <div class="speed-control">
+                        <label>Playback Speed:</label>
+                        <input type="range" id="speedSlider" min="100" max="3000" value="1000" step="100">
+                        <div class="speed-value" id="speedValue">1.0x</div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>🗑️ Actions</h3>
+                    <button class="btn btn-danger" id="btnClear">
+                        <span class="icon">🗑️</span> Clear All
+                    </button>
+                    <button class="btn btn-secondary" id="btnExport">
+                        <span class="icon">💾</span> Export JSON
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Canvas -->
+            <div class="canvas-container">
+                <div id="graphContainer"></div>
+            </div>
+            
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <div class="panel-tabs">
+                    <button class="panel-tab active" data-tab="validation">
+                        ✅ Validation
+                    </button>
+                    <button class="panel-tab" data-tab="sql">
+                        🗄️ SQL
+                    </button>
+                    <button class="panel-tab" data-tab="log">
+                        📋 Action Log
+                    </button>
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Validation Tab -->
+                    <div id="validationTab" class="active">
+                        <div class="validation-summary" id="validationSummary">
+                            <div class="validation-stat">
+                                <span class="label">Status:</span>
+                                <span class="value" id="validationStatus">Not validated</span>
+                            </div>
+                            <div class="validation-stat">
+                                <span class="label">Errors:</span>
+                                <span class="value" style="color: #ef4444" id="errorCount">0</span>
+                            </div>
+                            <div class="validation-stat">
+                                <span class="label">Warnings:</span>
+                                <span class="value" style="color: #f59e0b" id="warningCount">0</span>
+                            </div>
+                            <div class="validation-stat">
+                                <span class="label">Info:</span>
+                                <span class="value" style="color: #3b82f6" id="infoCount">0</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="btnValidate" style="margin-bottom: 15px;">
+                            ✅ Run Validation
+                        </button>
+                        
+                        <button class="btn btn-warning" id="btnAutoFix" style="margin-bottom: 15px;">
+                            🔧 Auto-Fix Issues
+                        </button>
+                        
+                        <div class="issue-list" id="issueList"></div>
+                    </div>
+                    
+                    <!-- SQL Tab -->
+                    <div id="sqlTab">
+                        <div class="dialect-selector">
+                            <label>SQL Dialect:</label>
+                            <select id="dialectSelect">
+                                <option value="mysql">MySQL</option>
+                                <option value="postgresql">PostgreSQL</option>
+                                <option value="sqlite">SQLite</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-success" id="btnGenerateSQL" style="margin-bottom: 15px;">
+                            🗄️ Generate SQL
+                        </button>
+                        
+                        <div class="sql-output" id="sqlOutput">-- Click "Generate SQL" to see output</div>
+                        
+                        <div class="sql-controls">
+                            <button class="btn btn-secondary" id="btnCopySQL">
+                                📋 Copy
+                            </button>
+                            <button class="btn btn-secondary" id="btnDownloadSQL">
+                                💾 Download
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Log Tab -->
+                    <div id="logTab">
+                        <h3 style="margin-bottom: 15px;">Recent Actions:</h3>
+                        <div id="actionLogList" style="font-size: 12px; color: #666;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <span id="statusText">Ready</span>
+            </div>
+            <div class="status-item">
+                <span>Entities: <strong id="entityCount">0</strong></span>
+                <span style="margin-left: 15px;">Actions: <strong id="actionCount">0</strong></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load mxGraph -->
+    <script src="lib/mxClient.min.js"></script>
+
+    <!-- Load ER Editor modules -->
+    <script src="lib/er-shapes.js"></script>
+    <script src="src/editor.js"></script>
+    <script src="src/playback.js"></script>
+    <script src="src/validator.js"></script>
+    <script src="src/sql-generator.js"></script>
+    
+    <!-- Main Application Logic -->
+    <script>
+        let editor, playback, validator, sqlGenerator;
+        
+        // Initialize application
+        window.onload = function() {
+            const container = document.getElementById('graphContainer');
+            editor = new EREditor(container);
+            playback = new ERPlayback(editor);
+            validator = new ERValidator(editor);
+            sqlGenerator = new SQLGenerator(editor);
+            
+            setupEventListeners();
+            updateStatus();
+            
+            console.log('ER Editor initialized!');
+        };
+        
+        function setupEventListeners() {
+            // Create buttons
+            document.getElementById('btnAddEntity').onclick = () => {
+                const name = prompt('Entity name:', 'NewEntity');
+                if (name) {
+                    editor.addEntity(name, 200 + Math.random() * 300, 150 + Math.random() * 200);
+                    updateStatus();
+                }
+            };
+            
+            document.getElementById('btnAddAttribute').onclick = () => {
+                const selected = editor.graph.getSelectionCell();
+                if (!selected || !editor.entities.has(selected.id)) {
+                    alert('Please select an entity first');
+                    return;
+                }
+                const name = prompt('Attribute name:', 'attribute');
+                if (name) {
+                    const isPK = confirm('Is this a primary key?');
+                    editor.addAttribute(selected, name, isPK);
+                    updateStatus();
+                }
+            };
+            
+            document.getElementById('btnAddRelationship').onclick = () => addRelationship('1:N');
+            document.getElementById('btnAddManyToMany').onclick = () => addRelationship('M:N');
+            
+            document.getElementById('btnMarkPK').onclick = () => {
+                const selected = editor.graph.getSelectionCell();
+                if (!selected || !editor.attributes.has(selected.id)) {
+                    alert('Please select an attribute first');
+                    return;
+                }
+                editor.markAsPrimaryKey(selected);
+                updateStatus();
+            };
+            
+            // Playback
+            document.getElementById('btnPlay').onclick = () => playback.play(parseInt(document.getElementById('speedSlider').value));
+            document.getElementById('btnPause').onclick = () => playback.pause();
+            document.getElementById('btnStop').onclick = () => playback.stop();
+            document.getElementById('btnReset').onclick = () => playback.reset();
+            document.getElementById('btnStepForward').onclick = () => playback.stepForward();
+            document.getElementById('btnStepBack').onclick = () => playback.stepBackward();
+            
+            document.getElementById('speedSlider').oninput = (e) => {
+                const speed = parseInt(e.target.value);
+                document.getElementById('speedValue').textContent = `${((3100 - speed) / 1000).toFixed(1)}x`;
+                playback.setSpeed(speed);
+            };
+            
+            // Validation
+            document.getElementById('btnValidate').onclick = runValidation;
+            document.getElementById('btnAutoFix').onclick = () => {
+                const result = validator.autoFix();
+                alert(`Fixed ${result.fixed.length} issues. ${result.remaining} remaining.`);
+                runValidation();
+                updateStatus();
+            };
+            
+            // SQL
+            document.getElementById('dialectSelect').onchange = (e) => sqlGenerator.setDialect(e.target.value);
+            document.getElementById('btnGenerateSQL').onclick = () => {
+                document.getElementById('sqlOutput').textContent = sqlGenerator.generate();
+            };
+            document.getElementById('btnCopySQL').onclick = () => {
+                navigator.clipboard.writeText(document.getElementById('sqlOutput').textContent);
+                alert('SQL copied!');
+            };
+            document.getElementById('btnDownloadSQL').onclick = () => {
+                const blob = new Blob([document.getElementById('sqlOutput').textContent], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'er-diagram.sql';
+                a.click();
+            };
+            
+            // Other
+            document.getElementById('btnClear').onclick = () => {
+                if (confirm('Clear all?')) {
+                    editor.clear();
+                    updateStatus();
+                }
+            };
+            document.getElementById('btnExport').onclick = () => {
+                const blob = new Blob([JSON.stringify(editor.exportDiagram(), null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'er-diagram.json';
+                a.click();
+            };
+            
+            // Tabs
+            document.querySelectorAll('.panel-tab').forEach(tab => {
+                tab.onclick = () => {
+                    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.panel-content > div').forEach(c => c.classList.remove('active'));
+                    document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+                };
+            });
+            
+            window.addEventListener('er-action', updateActionLog);
+        }
+        
+        function addRelationship(cardinality) {
+            const cells = editor.graph.getSelectionCells();
+            if (cells.length !== 2 || !editor.entities.has(cells[0].id) || !editor.entities.has(cells[1].id)) {
+                alert('Select exactly 2 entities');
+                return;
+            }
+            editor.addRelationship(cells[0], cells[1], cardinality, prompt('Relationship name (optional):', '') || '');
+            updateStatus();
+        }
+        
+        function updateStatus() {
+            document.getElementById('entityCount').textContent = editor.entities.size;
+            document.getElementById('actionCount').textContent = editor.actionLog.length;
+        }
+        
+        function runValidation() {
+            const result = validator.validate();
+            document.getElementById('validationStatus').textContent = result.summary.status;
+            document.getElementById('errorCount').textContent = result.summary.errors;
+            document.getElementById('warningCount').textContent = result.summary.warnings;
+            document.getElementById('infoCount').textContent = result.summary.info;
+            
+            const list = document.getElementById('issueList');
+            list.innerHTML = result.issues.length === 0 ? 
+                '<div style="color: #10b981; text-align: center; padding: 20px;">✅ No issues!</div>' :
+                result.issues.map(i => `
+                    <div class="issue ${i.severity}">
+                        <div class="issue-type">${i.type}</div>
+                        <div class="issue-message">${i.message}</div>
+                        ${i.suggestion ? `<div class="issue-suggestion">${i.suggestion}</div>` : ''}
+                    </div>
+                `).join('');
+        }
+        
+        function updateActionLog() {
+            const log = editor.getActionLog();
+            document.getElementById('actionLogList').innerHTML = log.slice(-10).reverse().map(a => 
+                `<div style="margin-bottom: 10px; padding: 8px; background: #f9fafb; border-radius: 4px;">
+                    <strong>${a.type}</strong><br>
+                    <span style="color: #888;">${new Date(a.timestamp).toLocaleTimeString()}</span>
+                </div>`
+            ).join('');
+        }
+    </script>
+</body>
+</html>
