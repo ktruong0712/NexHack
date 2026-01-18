@@ -1,0 +1,5 @@
+{
+  "name": "SprintGenius AI",
+  "description": "An AI-powered sprint report generator that analyzes GitHub commits, PRs, and issues to produce professional academic-grade documentation.",
+  "requestFramePermissions": []
+}
