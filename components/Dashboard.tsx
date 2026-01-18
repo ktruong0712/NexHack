@@ -22,9 +22,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [editName, setEditName] = useState<string>('');
 
   return (
-    <div className="max-w-5xl mx-auto space-y-20 py-8">
+    <div className="max-w-5xl mx-auto space-y-5 py-8">
       {/* Hero Section */}
-      <div className="text-center space-y-6 py-20">
+      <div className="text-center space-y-4 py-16">
         <h1 className="text-5xl tracking-tight text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
           Your Workspace
         </h1>
@@ -57,7 +57,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 {/* Icon */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="p-3 bg-gray-50 rounded-xl">
-                    <FileText size={20} className="text-gray-400" />
+                    <FileText size={30} className="text-gray-400" />
                   </div>
                   
                   {/* Menu */}
@@ -151,7 +151,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
       ) : (
-        <div className="text-center py-20 space-y-6">
+        <div className="text-center py-20 space-y-8">
           <div className="flex justify-center">
             <div className="p-6 bg-gray-50 rounded-full">
               <FolderOpen size={40} className="text-gray-300" />
