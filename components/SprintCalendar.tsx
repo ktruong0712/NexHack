@@ -1,6 +1,5 @@
-
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, GitCommit, CheckSquare, GitPullRequest, Info, Target } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, GitCommit, CheckSquare, GitPullRequest } from 'lucide-react';
 import { SprintData, Issue, Commit, PullRequest } from '../types';
 
 interface SprintCalendarProps {
@@ -84,73 +83,81 @@ export const SprintCalendar: React.FC<SprintCalendarProps> = ({ history, onSelec
   }, [history, weekDays]);
 
   return (
-    <div className="h-full flex flex-col space-y-6 animate-in fade-in duration-700">
-      {/* Calendar Header */}
-      <div className="flex items-center justify-between px-2">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-4">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-              <CalendarIcon className="text-indigo-600" size={28} />
-              {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-            </h2>
-            {isViewingCurrentWeek && (
-              <span className="flex items-center gap-1.5 px-3 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black rounded-full uppercase tracking-wider animate-pulse">
-                <Target size={12} /> Current Week
-              </span>
-            )}
-          </div>
-          
-          <div className="flex items-center bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <button 
-              onClick={() => navigateWeek(-1)} 
-              className="p-3 hover:bg-slate-50 border-r border-slate-200 transition-colors text-slate-400 hover:text-slate-900"
-              title="Previous Week"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button 
-              onClick={() => setCurrentDate(new Date())} 
-              className={`px-6 py-3 text-sm font-bold transition-all ${
-                isViewingCurrentWeek 
-                  ? 'bg-indigo-600 text-white' 
-                  : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              Today
-            </button>
-            <button 
-              onClick={() => navigateWeek(1)} 
-              className="p-3 hover:bg-slate-50 border-l border-slate-200 transition-colors text-slate-400 hover:text-slate-900"
-              title="Next Week"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+    <div className="max-w-7xl mx-auto space-y-8 py-8">
+      {/* Header */}
+      <div className="text-center space-y-4 mb-12">
+        <h1 className="text-4xl tracking-tight text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Sprint Timeline
+        </h1>
+        <p className="text-base text-gray-500 font-light">
+          View your sprint activity across time
+        </p>
+      </div>
+
+      {/* Calendar Controls */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-medium text-gray-900">
+            {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+          </h2>
+          {isViewingCurrentWeek && (
+            <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+              Current Week
+            </span>
+          )}
         </div>
         
-        <div className="flex gap-3 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
-          <LegendItem color="bg-indigo-500" label="Sprint" />
-          <LegendItem color="bg-emerald-500" label="Issue" />
-          <LegendItem color="bg-blue-500" label="PR" />
-          <LegendItem color="bg-amber-500" label="Commit" />
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => navigateWeek(-1)} 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-900"
+            title="Previous Week"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button 
+            onClick={() => setCurrentDate(new Date())} 
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+              isViewingCurrentWeek 
+                ? 'bg-gray-900 text-white' 
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            Today
+          </button>
+          <button 
+            onClick={() => navigateWeek(1)} 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-900"
+            title="Next Week"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
 
-      {/* Calendar Grid Container */}
-      <div className="flex-1 bg-white border border-slate-200 rounded-[40px] shadow-2xl overflow-hidden flex flex-col min-h-[600px] relative">
+      {/* Legend */}
+      <div className="flex gap-6 text-xs text-gray-500 pb-4 border-b border-gray-100">
+        <LegendItem color="bg-gray-900" label="Sprint" />
+        <LegendItem color="bg-green-500" label="Issue" />
+        <LegendItem color="bg-blue-500" label="PR" />
+        <LegendItem color="bg-amber-500" label="Commit" />
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         {/* Days Header */}
-        <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/50">
+        <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50">
           {weekDays.map((day, idx) => {
             const isToday = isSameDay(day, new Date());
             return (
-              <div key={idx} className={`p-6 text-center border-r border-slate-100 last:border-r-0 transition-colors ${isToday ? 'bg-indigo-50/30' : ''}`}>
-                <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-2 ${isToday ? 'text-indigo-600' : 'text-slate-400'}`}>
+              <div key={idx} className={`p-4 text-center border-r border-gray-100 last:border-r-0 ${isToday ? 'bg-gray-100' : ''}`}>
+                <p className={`text-xs font-medium mb-2 ${isToday ? 'text-gray-900' : 'text-gray-500'}`}>
                   {day.toLocaleDateString('default', { weekday: 'short' })}
                 </p>
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl text-xl font-black transition-all ${
+                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg text-lg font-medium ${
                   isToday 
-                    ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200 scale-110' 
-                    : 'text-slate-700 hover:bg-slate-200/50'
+                    ? 'bg-gray-900 text-white' 
+                    : 'text-gray-700'
                 }`}>
                   {day.getDate()}
                 </div>
@@ -159,118 +166,88 @@ export const SprintCalendar: React.FC<SprintCalendarProps> = ({ history, onSelec
           })}
         </div>
 
-        {/* Sprint Bars Overlay */}
-        <div className="relative border-b border-slate-100 min-h-[50px] bg-slate-50/20 p-3 space-y-2">
-          {visibleSprints.map((sprint) => {
-            const startIdx = weekDays.findIndex(d => isSameDay(d, new Date(sprint.startDate + 'T00:00:00')));
-            const endIdx = weekDays.findIndex(d => isSameDay(d, new Date(sprint.endDate + 'T00:00:00')));
-            
-            // Bounds handling for sprints that extend beyond current week
-            const effectiveStartIdx = startIdx === -1 ? 0 : startIdx;
-            const effectiveEndIdx = endIdx === -1 ? 6 : endIdx;
-            
-            const width = ((effectiveEndIdx - effectiveStartIdx + 1) / 7) * 100;
-            const left = (effectiveStartIdx / 7) * 100;
+        {/* Sprint Bars */}
+        {visibleSprints.length > 0 && (
+          <div className="relative border-b border-gray-100 bg-gray-50 p-3 space-y-2">
+            {visibleSprints.map((sprint) => {
+              const startIdx = weekDays.findIndex(d => isSameDay(d, new Date(sprint.startDate + 'T00:00:00')));
+              const endIdx = weekDays.findIndex(d => isSameDay(d, new Date(sprint.endDate + 'T00:00:00')));
+              
+              const effectiveStartIdx = startIdx === -1 ? 0 : startIdx;
+              const effectiveEndIdx = endIdx === -1 ? 6 : endIdx;
+              
+              const width = ((effectiveEndIdx - effectiveStartIdx + 1) / 7) * 100;
+              const left = (effectiveStartIdx / 7) * 100;
 
-            return (
-              <div 
-                key={sprint.id}
-                onClick={() => onSelectSprint(sprint)}
-                className="relative h-8 bg-indigo-600 text-white text-[10px] font-black px-4 rounded-xl flex items-center shadow-lg shadow-indigo-100 cursor-pointer hover:bg-indigo-700 hover:-translate-y-0.5 transition-all truncate uppercase tracking-wider z-10"
-                style={{ width: `${width}%`, left: `${left}%` }}
-              >
-                {sprint.repoName} — Sprint Active
-              </div>
-            );
-          })}
-          {visibleSprints.length === 0 && (
-            <div className="h-full flex items-center justify-center text-slate-300 text-[9px] font-black uppercase tracking-[0.3em] opacity-40">
-              No Sprints Scheduled for this Window
-            </div>
-          )}
-        </div>
+              return (
+                <div 
+                  key={sprint.id}
+                  onClick={() => onSelectSprint(sprint)}
+                  className="relative h-8 bg-gray-900 text-white text-xs font-medium px-3 rounded-lg flex items-center cursor-pointer hover:bg-gray-800 transition-all truncate"
+                  style={{ width: `${width}%`, left: `${left}%` }}
+                >
+                  {sprint.customName || sprint.repoName}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-        {/* Tasks/PRs/Commits Grid */}
-        <div className="flex-1 overflow-y-auto grid grid-cols-7 divide-x divide-slate-100">
+        {/* Activity Grid */}
+        <div className="grid grid-cols-7 divide-x divide-gray-100 min-h-[500px]">
           {weekDays.map((day, idx) => {
             const dateStr = formatDateString(day);
             const data = itemsByDay[dateStr];
             const isToday = isSameDay(day, new Date());
             
             return (
-              <div key={idx} className={`p-3 space-y-3 min-h-[400px] hover:bg-slate-50/50 transition-colors group relative ${isToday ? 'bg-indigo-50/10' : ''}`}>
-                {isToday && <div className="absolute inset-0 border-x-2 border-indigo-600/10 pointer-events-none" />}
-                
+              <div key={idx} className={`p-2 space-y-2 ${isToday ? 'bg-gray-50' : ''}`}>
                 {data.issues.map(issue => (
-                  <div key={issue.id} className="p-3 bg-emerald-50/80 border border-emerald-100 rounded-2xl shadow-sm hover:shadow-md transition-all group/item">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckSquare size={12} className="text-emerald-600" />
-                      <span className="text-[9px] font-black text-emerald-700 uppercase tracking-tighter">{issue.id}</span>
+                  <div key={issue.id} className="p-2 bg-green-50 border border-green-100 rounded-lg hover:shadow-sm transition-all">
+                    <div className="flex items-center gap-1 mb-1">
+                      <CheckSquare size={10} className="text-green-600" />
+                      <span className="text-[10px] font-medium text-green-700">{issue.id}</span>
                     </div>
-                    <p className="text-[11px] font-bold text-slate-800 leading-tight line-clamp-2">{issue.title}</p>
-                    <div className="mt-2 text-[8px] font-black text-emerald-600 uppercase">{issue.status}</div>
+                    <p className="text-[11px] text-gray-800 leading-tight line-clamp-2">{issue.title}</p>
                   </div>
                 ))}
 
                 {data.prs.map(pr => (
-                  <div key={pr.id} className="p-3 bg-blue-50/80 border border-blue-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
-                    <div className="flex items-center gap-2 mb-2">
-                      <GitPullRequest size={12} className="text-blue-600" />
-                      <span className="text-[9px] font-black text-blue-700 uppercase tracking-tighter">PR #{pr.number}</span>
+                  <div key={pr.id} className="p-2 bg-blue-50 border border-blue-100 rounded-lg hover:shadow-sm transition-all">
+                    <div className="flex items-center gap-1 mb-1">
+                      <GitPullRequest size={10} className="text-blue-600" />
+                      <span className="text-[10px] font-medium text-blue-700">#{pr.number}</span>
                     </div>
-                    <p className="text-[11px] font-bold text-slate-800 leading-tight line-clamp-2">{pr.title}</p>
-                    <div className={`mt-2 text-[8px] font-black uppercase ${pr.state === 'closed' ? 'text-indigo-600' : 'text-emerald-600'}`}>
-                      {pr.state}
-                    </div>
+                    <p className="text-[11px] text-gray-800 leading-tight line-clamp-2">{pr.title}</p>
                   </div>
                 ))}
 
                 {data.commits.map(commit => (
-                  <div key={commit.id} className="p-3 bg-amber-50/80 border border-amber-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
-                    <div className="flex items-center gap-2 mb-2">
-                      <GitCommit size={12} className="text-amber-600" />
-                      <span className="text-[9px] font-black text-amber-700 uppercase tracking-tighter">{commit.id}</span>
+                  <div key={commit.id} className="p-2 bg-amber-50 border border-amber-100 rounded-lg hover:shadow-sm transition-all">
+                    <div className="flex items-center gap-1 mb-1">
+                      <GitCommit size={10} className="text-amber-600" />
+                      <span className="text-[10px] font-medium text-amber-700">{commit.id}</span>
                     </div>
-                    <p className="text-[11px] font-medium text-slate-600 leading-tight italic line-clamp-2">"{commit.message}"</p>
-                    <div className="mt-2 text-[8px] font-black text-amber-500 uppercase">{commit.author.split(' ')[0]}</div>
+                    <p className="text-[11px] text-gray-600 leading-tight line-clamp-2 italic">"{commit.message}"</p>
                   </div>
                 ))}
-
-                {data.issues.length === 0 && data.commits.length === 0 && data.prs.length === 0 && (
-                   <div className="h-full w-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                   </div>
-                )}
               </div>
             );
           })}
         </div>
       </div>
-      
-      {/* Legend & Footer */}
-      <div className="flex justify-between items-center px-8 py-5 bg-slate-900 rounded-[30px] text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] shadow-xl">
-         <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg">
-              <Info size={16} />
-            </div>
-            <span>Select a Sprint timeline to generate or view deep-dive AI documentation</span>
-         </div>
-         <div className="flex items-center gap-6">
-            <span className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              Real-time Ecosystem Sync
-            </span>
-            <span className="text-white/20">|</span>
-            <span>SprintGenius Analytics Engine v2.5</span>
-         </div>
+
+      {/* Footer Info */}
+      <div className="text-center text-sm text-gray-400 py-6">
+        Click on a sprint bar to view detailed report
       </div>
     </div>
   );
 };
 
 const LegendItem = ({ color, label }: { color: string, label: string }) => (
-  <div className="flex items-center gap-2 px-3 border-r border-slate-100 last:border-0">
+  <div className="flex items-center gap-2">
     <div className={`w-2 h-2 rounded-full ${color}`} />
-    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">{label}</span>
+    <span>{label}</span>
   </div>
 );
