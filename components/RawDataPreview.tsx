@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { GitCommit, GitPullRequest, CheckSquare, Zap, ChevronRight, AlertCircle } from 'lucide-react';
+import { GitCommit, GitPullRequest, CheckSquare, AlertCircle } from 'lucide-react';
 import { SprintData } from '../types';
 
 interface RawDataPreviewProps {
@@ -10,35 +9,42 @@ interface RawDataPreviewProps {
 
 export const RawDataPreview: React.FC<RawDataPreviewProps> = ({ data, onNext }) => {
   return (
-    <div className="max-w-6xl mx-auto py-8 animate-in slide-in-from-right-4 duration-500">
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase leading-none">Step 3: Source Evidence</h2>
-          <p className="text-slate-500 font-medium">Verify detected activity before AI synthesis.</p>
-        </div>
+    <div className="max-w-6xl mx-auto py-12">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl tracking-tight text-gray-900 mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Verify Data
+        </h1>
+        <p className="text-base text-gray-500 font-light mb-8">
+          Review the collected activity before generating your report
+        </p>
         <button 
           onClick={onNext}
-          className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-indigo-600 transition-all active:scale-95 flex items-center gap-3"
+          className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-all shadow-sm"
         >
-          Generate Sprint Report <Zap size={18} className="fill-current" />
+          Generate Report
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Data Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Commits */}
-        <div className="bg-white rounded-[35px] border border-slate-200 overflow-hidden flex flex-col h-[600px] shadow-sm">
-          <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
-              <GitCommit size={16} className="text-indigo-600" /> Commits ({data.commits.length})
-            </h3>
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col h-[500px]">
+          <div className="p-4 bg-gray-50 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <GitCommit size={16} className="text-gray-400" />
+              <h3 className="text-sm font-medium text-gray-900">
+                Commits ({data.commits.length})
+              </h3>
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {data.commits.map(c => (
-              <div key={c.id} className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-white transition-all">
-                <p className="text-xs font-bold text-slate-800 leading-tight mb-1">"{c.message}"</p>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-[9px] font-black text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded">{c.author.split(' ')[0]}</span>
-                  <span className="text-[8px] font-bold text-slate-400">{c.date.split('T')[0]}</span>
+              <div key={c.id} className="p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-all">
+                <p className="text-xs text-gray-800 leading-tight mb-2">"{c.message}"</p>
+                <div className="flex justify-between items-center text-[10px]">
+                  <span className="text-gray-600 font-medium">{c.author.split(' ')[0]}</span>
+                  <span className="text-gray-400">{c.date.split('T')[0]}</span>
                 </div>
               </div>
             ))}
@@ -46,55 +52,89 @@ export const RawDataPreview: React.FC<RawDataPreviewProps> = ({ data, onNext }) 
         </div>
 
         {/* PRs */}
-        <div className="bg-white rounded-[35px] border border-slate-200 overflow-hidden flex flex-col h-[600px] shadow-sm">
-          <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
-              <GitPullRequest size={16} className="text-blue-600" /> Pull Requests ({data.pullRequests.length})
-            </h3>
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col h-[500px]">
+          <div className="p-4 bg-gray-50 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <GitPullRequest size={16} className="text-gray-400" />
+              <h3 className="text-sm font-medium text-gray-900">
+                Pull Requests ({data.pullRequests.length})
+              </h3>
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {data.pullRequests.map(pr => (
-              <div key={pr.id} className="p-4 bg-blue-50/20 rounded-2xl border border-blue-100/50 hover:bg-white transition-all">
+              <div key={pr.id} className="p-3 bg-blue-50 rounded-xl border border-blue-100 hover:border-blue-200 transition-all">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded-lg">#{pr.number}</span>
-                  <span className={`text-[8px] font-black uppercase ${pr.state === 'closed' ? 'text-indigo-600' : 'text-emerald-600'}`}>{pr.state}</span>
+                  <span className="text-[10px] font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                    #{pr.number}
+                  </span>
+                  <span className={`text-[10px] font-medium ${pr.state === 'closed' ? 'text-gray-600' : 'text-green-600'}`}>
+                    {pr.state}
+                  </span>
                 </div>
-                <p className="text-xs font-bold text-slate-800 leading-tight">{pr.title}</p>
-                <p className="text-[10px] text-slate-500 mt-2 italic truncate">{pr.body || 'No description provided.'}</p>
+                <p className="text-xs text-gray-800 leading-tight mb-1">{pr.title}</p>
+                {pr.body && (
+                  <p className="text-[10px] text-gray-500 mt-2 line-clamp-2">{pr.body}</p>
+                )}
               </div>
             ))}
           </div>
         </div>
 
         {/* Issues */}
-        <div className="bg-white rounded-[35px] border border-slate-200 overflow-hidden flex flex-col h-[600px] shadow-sm">
-          <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
-              <CheckSquare size={16} className="text-emerald-600" /> Jira Tasks ({data.issues.length})
-            </h3>
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col h-[500px]">
+          <div className="p-4 bg-gray-50 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <CheckSquare size={16} className="text-gray-400" />
+              <h3 className="text-sm font-medium text-gray-900">
+                Jira Issues ({data.issues.length})
+              </h3>
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-            {data.issues.map(i => (
-              <div key={i.id} className="p-4 bg-emerald-50/20 rounded-2xl border border-emerald-100/50 hover:bg-white transition-all">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-lg">{i.id}</span>
-                  <span className="text-[8px] font-black uppercase text-emerald-600">{i.status}</span>
+          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+            {data.issues.length > 0 ? (
+              data.issues.map(i => (
+                <div key={i.id} className="p-3 bg-green-50 rounded-xl border border-green-100 hover:border-green-200 transition-all">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded">
+                      {i.id}
+                    </span>
+                    <span className="text-[10px] font-medium text-green-600">
+                      {i.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-800 leading-tight mb-2">{i.title}</p>
+                  {i.labels.length > 0 && (
+                    <div className="flex gap-1 flex-wrap">
+                      {i.labels.map(l => (
+                        <span key={l} className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                          {l}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs font-bold text-slate-800 leading-tight">{i.title}</p>
-                <div className="mt-3 flex gap-1 flex-wrap">
-                  {i.labels.map(l => <span key={l} className="text-[8px] font-bold text-slate-400 border border-slate-200 px-2 py-0.5 rounded-full">{l}</span>)}
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center p-6">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                  <AlertCircle size={20} className="text-gray-300" />
                 </div>
-              </div>
-            ))}
-            {data.issues.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full opacity-40 text-center p-8">
-                <AlertCircle size={32} className="mb-4" />
-                <p className="text-xs font-bold uppercase tracking-widest">No Jira Context Linked</p>
-                <p className="text-[10px] font-medium mt-2">AI will infer requirements from commit patterns.</p>
+                <p className="text-sm font-medium text-gray-500 mb-1">No Jira Issues</p>
+                <p className="text-xs text-gray-400">
+                  Report will be generated from commits and PRs
+                </p>
               </div>
             )}
           </div>
         </div>
+      </div>
+
+      {/* Summary */}
+      <div className="mt-8 text-center">
+        <p className="text-sm text-gray-500">
+          Found {data.commits.length} commits, {data.pullRequests.length} pull requests, and {data.issues.length} issues
+        </p>
       </div>
     </div>
   );

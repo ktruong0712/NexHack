@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Layout, GraduationCap, Briefcase, FileText, Check } from 'lucide-react';
+import { Layout, Briefcase, FileText } from 'lucide-react';
 import { ReportTemplate } from '../types';
 
 interface TemplateSelectionProps {
@@ -8,54 +7,69 @@ interface TemplateSelectionProps {
 }
 
 export const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelect }) => {
-  const templates: { id: ReportTemplate; title: string; desc: string; icon: any; color: string }[] = [
+  const templates: { id: ReportTemplate; title: string; desc: string; icon: any }[] = [
     {
       id: 'generic',
       title: 'Generic Sprint Report',
       desc: 'Standard professional format for engineering managers and stakeholders.',
-      icon: Briefcase,
-      color: 'bg-blue-600'
-    },
-    {
-      id: 'cs-capstone',
-      title: 'CS Capstone Report',
-      desc: 'Academic format with focus on individual impact and technical implementation.',
-      icon: GraduationCap,
-      color: 'bg-emerald-600'
+      icon: Briefcase
     },
     {
       id: 'agile-reflection',
       title: 'Agile Reflection',
       desc: 'Introspective format focusing on process, blockers, and team dynamics.',
-      icon: Layout,
-      color: 'bg-indigo-600'
+      icon: Layout
     }
   ];
 
   return (
-    <div className="max-w-6xl mx-auto py-12 animate-in fade-in zoom-in-95 duration-500">
-      <div className="text-center mb-16">
-        <h2 className="text-4xl font-black text-slate-900 tracking-tight uppercase mb-4">Step 2: Documentation Format</h2>
-        <p className="text-slate-500 text-lg">Select a template to calibrate the tone and structure of your generated report.</p>
+    <div className="max-w-4xl mx-auto py-12">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl tracking-tight text-gray-900 mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Choose Report Style
+        </h1>
+        <p className="text-base text-gray-500 font-light">
+          Select a template to calibrate the tone and structure of your report
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Template Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {templates.map((tpl) => (
           <button
             key={tpl.id}
             onClick={() => onSelect(tpl.id)}
-            className="group relative bg-white border border-slate-200 rounded-[40px] p-10 text-left hover:border-indigo-600 hover:scale-105 transition-all shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10"
+            className="group relative bg-white border border-gray-200 rounded-2xl p-8 text-left hover:border-gray-900 hover:shadow-md transition-all"
           >
-            <div className={`w-16 h-16 ${tpl.color} rounded-[20px] flex items-center justify-center text-white mb-8 shadow-lg group-hover:rotate-12 transition-transform`}>
-              <tpl.icon size={28} />
+            {/* Icon */}
+            <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 mb-6 group-hover:bg-gray-900 group-hover:text-white transition-all">
+              <tpl.icon size={22} />
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-tight">{tpl.title}</h3>
-            <p className="text-slate-500 text-sm leading-relaxed mb-8">{tpl.desc}</p>
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
-              Select Template <Check size={14} />
+            
+            {/* Content */}
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {tpl.title}
+            </h3>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              {tpl.desc}
+            </p>
+
+            {/* Hover Indicator */}
+            <div className="mt-6 pt-6 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-xs font-medium text-gray-900">
+                Select this template →
+              </span>
             </div>
           </button>
         ))}
+      </div>
+
+      {/* Helper Text */}
+      <div className="text-center mt-12">
+        <p className="text-sm text-gray-400">
+          You can always regenerate with a different template later
+        </p>
       </div>
     </div>
   );
